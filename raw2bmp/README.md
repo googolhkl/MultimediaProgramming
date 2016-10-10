@@ -86,6 +86,17 @@
 | 22 | 2 | 색판의 수. 1이 유일한 유효값이다. |
 | 24 | 2 | 한화소에 들어가는 비트 수. 일반적으로 1, 4, 8, 24의 값이 쓰인다. |
 
+  
+# Build & Run
+##### 빌드와 실행은 아래를 따라하자.<br />
+```
+$ make
+$ ./main
+ RAW File Name : Lena.raw
+ BMP File Name : Lena.bmp
+ Raw Width : 256
+ Raw Height : 256
+```
 
 
 
