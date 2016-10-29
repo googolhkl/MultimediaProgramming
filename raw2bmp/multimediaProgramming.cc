@@ -40,14 +40,14 @@ namespace hkl
         in = fopen(szRawName, "rb");
         if(in == NULL)
         {   
-            printf("File Open Error1!\n");
+            std::cout<<"File Open Error!"<<std::endl;
             return false;
         }
 
         out = fopen(szBmpName, "wb");
         if(out == NULL)
         {
-            printf("File Open Error2!\n");
+            std::cout<<"File Open Error!"<<std::endl;
             return false;
         }
 
