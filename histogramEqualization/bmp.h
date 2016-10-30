@@ -21,6 +21,7 @@ namespace hkl
 class BMP 
 {
     private:
+    public:
         // BMP 파일 헤더
         typedef struct tagBITMAPFILEHEADER
         {
@@ -60,12 +61,12 @@ class BMP
         char szBmpName[80];
         DWORD nWidth, nHeight;
 
-    public:
         BMP();
         ~BMP();
         DWORD getnWidth();
         DWORD getnHeight();
-        bool LoadBmp(char* filename, BYTE** pImage);
+        bool LoadBmp(const char* filename, BYTE** pImage, BITMAPFILEHEADER** BMFH, BITMAPINFOHEADER** BMIH, RGBQUAD** rgbPal);
+        bool SaveBmp(const char* filename, BYTE* pImage,BITMAPFILEHEADER file_h, BITMAPINFOHEADER info_h, RGBQUAD* rgbPal);
 
 
 }; //BMP
