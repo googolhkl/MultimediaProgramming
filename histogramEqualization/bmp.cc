@@ -10,6 +10,29 @@ namespace hkl
     DWORD BMP::getnWidth(){ return this->nWidth; }
     DWORD BMP::getnHeight(){ return this->nHeight; }
 
+    void BMP::ShowHeaders()
+    {
+        std::cout<<"-----Bitmap File Header-----"<<std::endl;
+        std::cout<<"bfType :"<<file_h->bfType<<std::endl;
+        std::cout<<"bfSize :"<<file_h->bfSize<<std::endl;
+        std::cout<<"bfReserved1 :"<<file_h->bfReserved1<<std::endl;
+        std::cout<<"bfReserved2 :"<<file_h->bfReserved2<<std::endl;
+        std::cout<<"bfOffBits :"<<file_h->bfOffBits<<std::endl<<std::endl;
+
+        std::cout<<"-----Bitmap Info Header-----"<<std::endl;
+        std::cout<<"biSize :"<<info_h->biSize<<std::endl;
+        std::cout<<"biWidth :"<<info_h->biWidth<<std::endl;
+        std::cout<<"biHeight :"<<info_h->biHeight<<std::endl;
+        std::cout<<"biPlanes :"<<info_h->biPlanes<<std::endl;
+        std::cout<<"biBitCount :"<<info_h->biBitCount<<std::endl;
+        std::cout<<"biCompression :"<<info_h->biCompression<<std::endl;
+        std::cout<<"biSizeImage :"<<info_h->biSizeImage<<std::endl;
+        std::cout<<"biXPelsPerMeter :"<<info_h->biXPelsPerMeter<<std::endl;
+        std::cout<<"biYPelsPerMeter :"<<info_h->biYPelsPerMeter<<std::endl;
+        std::cout<<"biClrUsed :"<<info_h->biClrUsed<<std::endl;
+        std::cout<<"biClrImportant :"<<info_h->biClrImportant<<std::endl;
+    }
+
 
     bool BMP::LoadBmp(const char* filename)
     {
@@ -31,6 +54,7 @@ namespace hkl
             LOG("파일 오픈 성공...");
         }
 
+        // Bitmap File Header 가져오기
         fread(file_h, sizeof(BITMAPFILEHEADER), 1, fp);
         if( (file_h)->bfType != 0x4d42)
         {
@@ -43,6 +67,7 @@ namespace hkl
             LOG("BMP 파일 확인 완료...");
         }
 
+        // Bitmap Info Header 가져오기
         fread(info_h, sizeof(BITMAPINFOHEADER), 1, fp);
         if((info_h)->biBitCount != 8 || (info_h)->biCompression != BI_RGB)
         {
@@ -56,16 +81,16 @@ namespace hkl
             LOG("압축된 파일 확인 완료...");
         }
 
+        // 팔레트 정보 가져오기
         fread(rgbPal, sizeof(RGBQUAD)*256, 1, fp);
 
-        LONG Width = (info_h)->biWidth;  //512
+        LONG Width = (info_h)->biWidth;      //512
         LONG Height = (info_h)->biHeight;    //512
         DWORD dwLine = ((((Width * (info_h)->biBitCount) + 31) &~31) >>3);   //512
-        DWORD size = (file_h)->bfSize;   // 263222
+        DWORD size = (file_h)->bfSize;      // 263222
         DWORD dwRawSize = (info_h)->biWidth * (info_h)->biHeight; //262144
 
         image = new BYTE[(info_h)->biSizeImage];
-        //*pImage += dwLine * Height;
         readSize = fread(image, 1, (info_h)->biSizeImage, fp);
         std::cout<<"읽어들인 이미지 크기 "<<readSize<<"..."<<std::endl;
         
@@ -73,7 +98,7 @@ namespace hkl
         return true;
     }
 
-    bool BMP::SaveBmp(const char* filename,void (BMP::*func)(void))
+    bool BMP::SaveBmp(const char* filename)
     {
         int i;
 
@@ -92,10 +117,38 @@ namespace hkl
         /*  이미지 파일 수정할 코드 작성 */
         for(i=0; i< info_h->biSizeImage; i++)
         {
-            //image[i] = DebugWhiteDot(image[i], 42);
-            image[i] = SubClipped(image[i], 20);
-            (this->*func)();
+            image[i] = DebugWhiteDot(image[i], 42);
+            //image[i] = SubClipped(image[i], 20);
         }
+
+        fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
+        fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
+        fwrite((char*)rgbPal, 1, sizeof(RGBQUAD)*256, fp);
+        fwrite(image, 1, info_h->biSizeImage, fp);
+
+        fclose(fp);
+        return true;
+    }
+
+
+    bool BMP::SaveBmp(const char* filename,void (BMP::*func)(void))
+    {
+        int i;
+
+        FILE* fp = nullptr;
+        fp = fopen(filename, "wb");
+        if(fp == nullptr)
+        {
+            LOG("파일 오픈 실패...");
+            return false;
+        }
+        else
+        {
+            LOG("파일 오픈 성공...");
+        }
+        
+        // 이미지 수정하는 멤버 함수
+        (this->*func)();
 
         fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
         fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
@@ -132,11 +185,12 @@ namespace hkl
 
     bool BMP::GarbageCollection()
     {
-        LOG("collection!");
+        LOG("필요없는 자원 수거 중...");
         delete[] image;
         delete[] file_h;
         delete[] info_h;
         delete[] rgbPal;
+        LOG("필요없는 자원 수거 완료...");
         return true;
     }
 
@@ -160,8 +214,44 @@ namespace hkl
         return (BYTE)px;
     }
 
-    void BMP::func(void)
+    void BMP::histogramEQ(void)
     {
-        std::cout<<"hello"<<std::endl;
+        LONG Number_of_Pel = 0;
+        LONG Max_Pel_Value = 255;
+        LONG sum = 0;
+
+        histogram = new BYTE[256];
+        normalizedSum = new double[256];
+        LONG sumArr[256];
+
+        // Histogram 채우기 (픽셀에 해당하는 값 카운트)
+        for(int i=0; i<info_h->biSizeImage; i++)
+        {
+            histogram[image[i]]++;
+        }
+
+        // Histogram의 Sum구하기
+        for(int i=0; i<256; i++)
+        {
+           sum += histogram[i];
+           sumArr[i] = sum;
+        }
+        Number_of_Pel = sumArr[255];
+        
+        // LTU 만들기
+        for(int i=0; i<256; i++)
+        {
+           normalizedSum[i] = ((double)Max_Pel_Value/Number_of_Pel) * sumArr[i];
+           normalizedSum[i] += 0.5;
+           normalizedSum[i] = (BYTE)(normalizedSum[i]);
+        }
+
+        // LTU(normalizedSum)을 통한 이미지 변환
+        for(int i=0; i<info_h->biSizeImage; i++)
+        {
+            image[i] = normalizedSum[image[i]];
+        }
+        delete[] histogram;
+        delete[] normalizedSum;
     }
 }// hkl
