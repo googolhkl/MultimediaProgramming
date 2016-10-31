@@ -14,7 +14,10 @@ typedef unsigned char  BYTE;    // 1byte
 #define BI_RGB  0
 #endif
 
+#define MAX_RGB 240
+#define MIN_RGB 16
 #define LOG(_str_) std::cout<<_str_<<std::endl
+
 
 namespace hkl
 {
@@ -60,6 +63,7 @@ class BMP
         char szBmpName[80];
         DWORD nWidth, nHeight;
 
+        /* 메소드들 */
         BMP();
         ~BMP();
         DWORD getnWidth();
@@ -69,6 +73,8 @@ class BMP
         BYTE DebugBlackDot(int px, int number);
         BYTE DebugWhiteDot(int px, int number);
         bool GarbageCollection();
+        BYTE AddClipped(int px, int number);
+        BYTE SubClipped(int px, int number);
 
     private:
         BYTE* image;

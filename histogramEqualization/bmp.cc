@@ -92,7 +92,8 @@ namespace hkl
         /*  이미지 파일 수정할 코드 작성 */
         for(i=0; i< info_h->biSizeImage; i++)
         {
-            image[i] = DebugWhiteDot(image[i], 42);
+            //image[i] = DebugWhiteDot(image[i], 42);
+            image[i] = SubClipped(image[i], 20);
             
         }
 
@@ -131,9 +132,31 @@ namespace hkl
 
     bool BMP::GarbageCollection()
     {
+        LOG("collection!");
+        delete[] image;
         delete[] file_h;
         delete[] info_h;
         delete[] rgbPal;
         return true;
+    }
+
+    BYTE BMP::AddClipped(int px, int number)
+    {
+        px += number;
+        if(px > MAX_RGB)
+        {
+            px = MAX_RGB;
+        }
+        return (BYTE)px;
+    }
+
+    BYTE BMP::SubClipped(int px, int number)
+    {
+        px -= number;
+        if(px < MIN_RGB)
+        {
+            px = MIN_RGB;
+        }
+        return (BYTE)px;
     }
 }// hkl
