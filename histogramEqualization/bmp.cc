@@ -13,7 +13,7 @@ namespace hkl
     bool BMP::LoadBmp(const char* filename, BYTE** pImage, BITMAPFILEHEADER** BMFH, BITMAPINFOHEADER** BMIH, RGBQUAD** rgbPal)
     {
         FILE* fp;
-        int i;
+        int readSize=0;
 
         *BMFH = new BITMAPFILEHEADER;
         *BMIH = new BITMAPINFOHEADER;
@@ -64,40 +64,10 @@ namespace hkl
         DWORD dwRawSize = (*BMIH)->biWidth * (*BMIH)->biHeight; //262144
 
         *pImage = new BYTE[(*BMIH)->biSizeImage];
-
         //*pImage += dwLine * Height;
-        printf("읽어들인 사이즈 : %d\n",fread(*pImage, 1, (*BMIH)->biSizeImage, fp));
-        printf("%d\n", (*pImage)[0]);
+        readSize = fread(*pImage, 1, (*BMIH)->biSizeImage, fp);
+        std::cout<<"읽어들인 이미지 크기 "<<readSize<<"..."<<std::endl;
         
-
-        /*
-        printf("------------------------------\n");
-        printf("bfType= %c\n", (*BMFH)->bfType);
-        printf("bfSize= %d\n", (*BMFH)->bfSize);
-        printf("bfReserved1= %d\n", (*BMFH)->bfReserved1);
-        printf("bfReserved2= %d\n", (*BMFH)->bfReserved2);
-        printf("bfOffBits= %d\n\n", (*BMFH)->bfOffBits);
-
-        printf("biSize= %d\n", (*BMIH)->biSize);
-        printf("biWidth= %d\n", (*BMIH)->biWidth);
-        printf("biHeight= %d\n", (*BMIH)->biHeight);
-        printf("biPlanes= %d\n", (*BMIH)->biPlanes);
-        printf("biBitCount= %d\n", (*BMIH)->biBitCount);
-        printf("biCompression= %d\n", (*BMIH)->biCompression);
-        printf("biSizeImage= %d\n", (*BMIH)->biSizeImage);
-        printf("biXPelsPerMeter= %d\n", (*BMIH)->biXPelsPerMeter);
-        printf("biYPelsPerMeter= %d\n", (*BMIH)->biYPelsPerMeter);
-        printf("biClrUsed= %d\n", (*BMIH)->biClrUsed);
-        printf("biClrImportant= %d\n", (*BMIH)->biClrImportant);
-        printf("------------------------------\n");
-
-        for(i = 0; i <256; i++)
-        {
-            printf("red=%d, green=%d, blue=%d\n",(*rgbPal)[i].rgbRed, (*rgbPal)[i].rgbGreen, (*rgbPal)[i].rgbBlue);
-        }
-        */
-
-
         fclose(fp);
         return true;
     }
@@ -117,49 +87,12 @@ namespace hkl
         {
             LOG("파일 오픈 성공...");
         }
-
-
-        printf("------------------------------\n");
-        printf("bfType= %c\n", file_h.bfType);
-        printf("bfSize= %d\n", file_h.bfSize);
-        printf("bfReserved1= %d\n", file_h.bfReserved1);
-        printf("bfReserved2= %d\n", file_h.bfReserved2);
-        printf("bfOffBits= %d\n\n", file_h.bfOffBits);
-
-        printf("biSize= %d\n", info_h.biSize);
-        printf("biWidth= %d\n", info_h.biWidth);
-        printf("biHeight= %d\n", info_h.biHeight);
-        printf("biPlanes= %d\n", info_h.biPlanes);
-        printf("biBitCount= %d\n", info_h.biBitCount);
-        printf("biCompression= %d\n", info_h.biCompression);
-        printf("biSizeImage= %d\n", info_h.biSizeImage);
-        printf("biXPelsPerMeter= %d\n", info_h.biXPelsPerMeter);
-        printf("biYPelsPerMeter= %d\n", info_h.biYPelsPerMeter);
-        printf("biClrUsed= %d\n", info_h.biClrUsed);
-        printf("biClrImportant= %d\n", info_h.biClrImportant);
-        printf("------------------------------\n");
-
-        for(i = 0; i <256; i++)
-        {
-            printf("red=%d, green=%d, blue=%d\n",(rgbPal)[i].rgbRed, (rgbPal)[i].rgbGreen, (rgbPal)[i].rgbBlue);
-        }
         
-
-        /*
-        for(i = 0; i <256; i++)
-        {
-            printf("red=%d, green=%d, blue=%d\n",rgbPal[i].rgbRed, rgbPal[i].rgbGreen, rgbPal[i].rgbBlue);
-        }
-        */
-        i = 0;
+        /*  이미지 파일 수정할 코드 작성 */
         for(i=0; i< info_h.biSizeImage; i++)
         {
             printf("%d\n", pImage[i++]);
         }
-        printf("i = %d\n", i);
-        printf("rgbPal = %d\n", sizeof(rgbPal));
-        printf("RGBQUA = %d\n", sizeof(RGBQUAD));
-        
 
         fwrite((char*)&file_h, 1, sizeof(BITMAPFILEHEADER), fp);
         fwrite((char*)&info_h, 1, sizeof(BITMAPINFOHEADER), fp);
