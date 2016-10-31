@@ -238,7 +238,7 @@ namespace hkl
         }
         Number_of_Pel = sumArr[255];
         
-        // LTU 만들기
+        // LUT 만들기
         for(int i=0; i<256; i++)
         {
            normalizedSum[i] = ((double)Max_Pel_Value/Number_of_Pel) * sumArr[i];
@@ -246,7 +246,7 @@ namespace hkl
            normalizedSum[i] = (BYTE)(normalizedSum[i]);
         }
 
-        // LTU(normalizedSum)을 통한 이미지 변환
+        // LUT(normalizedSum)을 통한 이미지 변환
         for(int i=0; i<info_h->biSizeImage; i++)
         {
             image[i] = normalizedSum[image[i]];
