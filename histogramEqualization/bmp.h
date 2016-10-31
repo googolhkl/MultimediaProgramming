@@ -69,12 +69,14 @@ class BMP
         DWORD getnWidth();
         DWORD getnHeight();
         bool LoadBmp(const char* filename);
-        bool SaveBmp(const char* filename);
+        bool SaveBmp(const char* filename, void (hkl::BMP::*func)(void));
         BYTE DebugBlackDot(int px, int number);
         BYTE DebugWhiteDot(int px, int number);
         bool GarbageCollection();
         BYTE AddClipped(int px, int number);
         BYTE SubClipped(int px, int number);
+
+        void func(void);
 
     private:
         BYTE* image;

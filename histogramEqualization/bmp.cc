@@ -73,7 +73,7 @@ namespace hkl
         return true;
     }
 
-    bool BMP::SaveBmp(const char* filename)
+    bool BMP::SaveBmp(const char* filename,void (BMP::*func)(void))
     {
         int i;
 
@@ -94,7 +94,7 @@ namespace hkl
         {
             //image[i] = DebugWhiteDot(image[i], 42);
             image[i] = SubClipped(image[i], 20);
-            
+            (this->*func)();
         }
 
         fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
@@ -158,5 +158,10 @@ namespace hkl
             px = MIN_RGB;
         }
         return (BYTE)px;
+    }
+
+    void BMP::func(void)
+    {
+        std::cout<<"hello"<<std::endl;
     }
 }// hkl
