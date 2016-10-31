@@ -6,6 +6,7 @@ using namespace std;
 int main()
 {
     hkl::BMP controller;
+    /*
     BYTE* image;
     hkl::BMP::BITMAPFILEHEADER* file_h;
     hkl::BMP::BITMAPINFOHEADER* info_h;
@@ -17,5 +18,11 @@ int main()
     delete[] file_h;
     delete[] info_h;
     delete[] rgbPal;
+    */
+
+    controller.LoadBmp("map.bmp");
+    controller.SaveBmp("result.bmp");
+    controller.GarbageCollection();
+
     return 0;
 }
