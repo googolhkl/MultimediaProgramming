@@ -9,7 +9,7 @@ int main()
 
     controller.LoadBmp("map.bmp");
     //controller.ShowHeaders();
-    //controller.SaveBmp("result.bmp");
+    //controller.DebugBlackDotSave("test.bmp",false, 42);
     controller.SaveBmp("result.bmp", &hkl::BMP::histogramEQ);
     controller.GarbageCollection();
     return 0;

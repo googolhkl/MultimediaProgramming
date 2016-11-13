@@ -70,8 +70,8 @@ class BMP
         DWORD getnHeight();
         void ShowHeaders();
         bool LoadBmp(const char* filename);
-        bool SaveBmp(const char* filename);
         bool SaveBmp(const char* filename, void (hkl::BMP::*func)(void));
+        bool DebugBlackDotSave(const char* filename,bool flag, int num);
         BYTE DebugBlackDot(int px, int number);
         BYTE DebugWhiteDot(int px, int number);
         bool GarbageCollection();
@@ -80,11 +80,11 @@ class BMP
         void histogramEQ(void);
 
     private:
-        BYTE* image;
+        BYTE** image;
         BITMAPFILEHEADER* file_h;
         BITMAPINFOHEADER* info_h;
         RGBQUAD* rgbPal;
-        BYTE* histogram;
+        int* histogram;
         double* normalizedSum;
 }; //BMP
 }  //hkl

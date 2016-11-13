@@ -90,46 +90,26 @@ namespace hkl
         DWORD size = (file_h)->bfSize;      // 263222
         DWORD dwRawSize = (info_h)->biWidth * (info_h)->biHeight; //262144
 
-        image = new BYTE[(info_h)->biSizeImage];
-        readSize = fread(image, 1, (info_h)->biSizeImage, fp);
+        image = new BYTE*[(info_h)->biHeight];
+        for(int i=0; i<(info_h)->biHeight; i++)
+        {
+            image[i] = new BYTE[(info_h)->biWidth];
+            memset(image[i], 0, (sizeof(BYTE))*((info_h)->biWidth));
+        }
+        //readSize = fread(image, 1, (info_h)->biSizeImage, fp);
+        for(int i=0; i<(info_h)->biHeight; i++)
+        {
+                readSize += fread(image[i],1, (info_h)->biWidth, fp);
+                for(int j=0; j< (info_h)->biWidth; j++)
+                {
+                }
+        }
+
         std::cout<<"읽어들인 이미지 크기 "<<readSize<<"..."<<std::endl;
         
         fclose(fp);
         return true;
     }
-
-    bool BMP::SaveBmp(const char* filename)
-    {
-        int i;
-
-        FILE* fp = nullptr;
-        fp = fopen(filename, "wb");
-        if(fp == nullptr)
-        {
-            LOG("파일 오픈 실패...");
-            return false;
-        }
-        else
-        {
-            LOG("파일 오픈 성공...");
-        }
-        
-        /*  이미지 파일 수정할 코드 작성 */
-        for(i=0; i< info_h->biSizeImage; i++)
-        {
-            image[i] = DebugWhiteDot(image[i], 42);
-            //image[i] = SubClipped(image[i], 20);
-        }
-
-        fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
-        fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
-        fwrite((char*)rgbPal, 1, sizeof(RGBQUAD)*256, fp);
-        fwrite(image, 1, info_h->biSizeImage, fp);
-
-        fclose(fp);
-        return true;
-    }
-
 
     bool BMP::SaveBmp(const char* filename,void (BMP::*func)(void))
     {
@@ -153,7 +133,52 @@ namespace hkl
         fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
         fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
         fwrite((char*)rgbPal, 1, sizeof(RGBQUAD)*256, fp);
-        fwrite(image, 1, info_h->biSizeImage, fp);
+        for(int i=0; i<(info_h)->biHeight; i++)
+        {
+            fwrite(image[i],1, (info_h)->biWidth, fp);
+        }
+
+        fclose(fp);
+        return true;
+    }
+
+    bool BMP::DebugBlackDotSave(const char* filename,bool flag, int num)
+    {
+        int i;
+
+        FILE* fp = nullptr;
+        fp = fopen(filename, "wb");
+        if(fp == nullptr)
+        {
+            LOG("파일 오픈 실패...");
+            return false;
+        }
+        else
+        {
+            LOG("파일 오픈 성공...");
+        }
+        for(int i=0; i<info_h->biHeight; i++)
+        {
+            for(int j=0; j<info_h->biWidth; j++)
+            {
+                if(flag == true)
+                {
+                    image[i][j] = DebugBlackDot(image[i][j], num);
+                }
+                else
+                {
+                    image[i][j] = DebugWhiteDot(image[i][j], num);
+                }
+            }
+        }
+
+        fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
+        fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
+        fwrite((char*)rgbPal, 1, sizeof(RGBQUAD)*256, fp);
+        for(int i=0; i<(info_h)->biHeight; i++)
+        {
+            fwrite(image[i],1, (info_h)->biWidth, fp);
+        }
 
         fclose(fp);
         return true;
@@ -186,6 +211,10 @@ namespace hkl
     bool BMP::GarbageCollection()
     {
         LOG("필요없는 자원 수거 중...");
+        for(int i=0; i<info_h->biHeight; i++)
+        {
+            delete[] image[i];
+        }
         delete[] image;
         delete[] file_h;
         delete[] info_h;
@@ -220,14 +249,24 @@ namespace hkl
         LONG Max_Pel_Value = 255;
         LONG sum = 0;
 
-        histogram = new BYTE[256];
+        histogram = new int[256];
         normalizedSum = new double[256];
         LONG sumArr[256];
 
-        // Histogram 채우기 (픽셀에 해당하는 값 카운트)
-        for(int i=0; i<info_h->biSizeImage; i++)
+        for(int i=0; i<256; i++)
         {
-            histogram[image[i]]++;
+            histogram[i] = 0;
+        }
+
+        int count =0;
+        // Histogram 채우기 (픽셀에 해당하는 값 카운트)
+        for(int i=0; i<info_h->biHeight; i++)
+        {
+            for(int j=0; j<info_h->biWidth; j++)
+            {
+                histogram[image[i][j]]++;
+                count++;
+            }
         }
 
         // Histogram의 Sum구하기
@@ -241,15 +280,18 @@ namespace hkl
         // LUT 만들기
         for(int i=0; i<256; i++)
         {
-           normalizedSum[i] = ((double)Max_Pel_Value/Number_of_Pel) * sumArr[i];
+           normalizedSum[i] = ((double)sumArr[i]*Max_Pel_Value/(info_h->biWidth * info_h->biHeight));
            normalizedSum[i] += 0.5;
            normalizedSum[i] = (BYTE)(normalizedSum[i]);
         }
 
         // LUT(normalizedSum)을 통한 이미지 변환
-        for(int i=0; i<info_h->biSizeImage; i++)
+        for(int i=0; i<info_h->biHeight; i++)
         {
-            image[i] = normalizedSum[image[i]];
+            for(int j=0; j<info_h->biWidth; j++)
+            {
+                image[i][j] = normalizedSum[image[i][j]];
+            }
         }
         delete[] histogram;
         delete[] normalizedSum;

@@ -10,4 +10,4 @@ $(MAIN).o: $(MAIN).cc
 	$(GXX) -c -g $(MAIN).cc $(LINKEDFILE).cc 
 
 clean :
-	rm $(MAIN) $(MAIN).o $(LINKEDFILE).o
+	rm $(MAIN) $(MAIN).o $(LINKEDFILE).o result.bmp
