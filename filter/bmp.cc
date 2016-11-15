@@ -323,7 +323,8 @@ namespace hkl
             for(int j=0; j<this->filterX; j++)
             {
                 printf("filter[%d][%d] :",i,j);
-                scanf("%lf", &filter[i][j]);
+                //scanf("%lf", &filter[i][j]);
+                filter[i][j] = scanFraction();
             }
         }
         return (double**)filter;
@@ -434,5 +435,24 @@ namespace hkl
 
         fclose(fp);
         return true;
+    }
+
+    double BMP::scanFraction()
+    {
+        std::string str;
+        double result = 0;
+        std::cin>>str;
+
+        if(str.find("/") != std::string::npos)
+        {
+            double temp1 = std::stoi(str.substr(0,str.find("/")));
+            double temp2 = std::stoi(str.substr(str.find("/")+1, str.size()));
+            result = temp1/temp2;
+        }
+        else
+        {
+            result = std::stoi(str);
+        }
+        return result;
     }
 }// hkl

@@ -6,12 +6,18 @@ using namespace std;
 int main()
 {
     hkl::BMP controller;
+    int x,y;
 
     controller.LoadBmp("boats.bmp");
     //controller.ShowHeaders();
     //controller.DebugBlackDotSave("test.bmp",false, 42);
     //controller.SaveBmp("result.bmp", &hkl::BMP::histogramEQ);
-    controller.ConvolutionFilter("result.bmp",3,3);
+    cout<<"input filter 'x' size :";
+    cin>>x;
+    cout<<"input filter 'y' size :";
+    cin>>y;
+
+    controller.ConvolutionFilter("result.bmp",y,x);
     controller.GarbageCollection();
     return 0;
 }

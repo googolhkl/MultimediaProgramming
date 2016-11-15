@@ -4,6 +4,7 @@
 #include<cstdio>
 #include<cstdlib>
 #include<iostream>
+#include<string>
 
 typedef unsigned short WORD;    // 2byte
 typedef unsigned int   DWORD;   // 4byte
@@ -84,6 +85,7 @@ class BMP
         double **makeTempFilter(int i, int j);
         BYTE calcFilter(void);
         bool ConvolutionFilter(const char *filename,int y, int x);
+        double scanFraction();
 
     private:
         BYTE** image;
