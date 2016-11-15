@@ -390,7 +390,7 @@ namespace hkl
     }
 
 
-    bool BMP::ConvolutionFilter(const char *filename)
+    bool BMP::ConvolutionFilter(const char *filename,int y,int x)
     {
         int i;
 
@@ -414,7 +414,7 @@ namespace hkl
         }
 
 
-        makeFilter(3,3);
+        makeFilter(y,x);
         for(int i=0; i<info_h->biHeight; i++)
         {
             for(int j=0; j< info_h->biWidth; j++)

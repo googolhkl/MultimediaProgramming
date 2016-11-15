@@ -83,7 +83,7 @@ class BMP
         double **makeFilter(int x,int y);
         double **makeTempFilter(int i, int j);
         BYTE calcFilter(void);
-        bool ConvolutionFilter(const char *filename);
+        bool ConvolutionFilter(const char *filename,int y, int x);
 
     private:
         BYTE** image;

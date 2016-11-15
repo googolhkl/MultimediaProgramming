@@ -11,11 +11,7 @@ int main()
     //controller.ShowHeaders();
     //controller.DebugBlackDotSave("test.bmp",false, 42);
     //controller.SaveBmp("result.bmp", &hkl::BMP::histogramEQ);
-    //double ** p1 = controller.makeFilter(3,3);
-    //double ** p2 = controller.makeTempFilter(0,0);
-    //controller.calcFilter(p1,p2);
-    //controller.SaveBmp("result.bmp", &hkl::BMP::ConvolutionFilter);
-    controller.ConvolutionFilter("result.bmp");
+    controller.ConvolutionFilter("result.bmp",3,3);
     controller.GarbageCollection();
     return 0;
 }
