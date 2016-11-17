@@ -80,12 +80,12 @@ class BMP
         BYTE SubClipped(int px, int number);
         void histogramEQ(void);
         BYTE ConvolutionFilter(int x,int y);
-
         double **makeFilter(int x,int y);
         double **makeTempFilter(int i, int j);
         BYTE calcFilter(void);
         bool ConvolutionFilter(const char *filename,int y, int x);
         double scanFraction();
+        bool makeCZP();
 
     private:
         BYTE** image;
@@ -96,7 +96,7 @@ class BMP
         int* histogram;
         double* normalizedSum;
 
-        int filterX=0, filterY=0;
+        int filterX, filterY;
         double **filter;
         double **makedFilter;
 

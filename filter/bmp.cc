@@ -1,6 +1,7 @@
 #include "bmp.h"
 #include <iostream>
 #include <cstdio>
+#include <math.h>
 
 namespace hkl
 {
@@ -323,7 +324,6 @@ namespace hkl
             for(int j=0; j<this->filterX; j++)
             {
                 printf("filter[%d][%d] :",i,j);
-                //scanf("%lf", &filter[i][j]);
                 filter[i][j] = scanFraction();
             }
         }
@@ -454,5 +454,78 @@ namespace hkl
             result = std::stoi(str);
         }
         return result;
+    }
+
+    bool BMP::makeCZP()
+    {
+        double PI = 3.141592;
+        unsigned char H = 128;
+        unsigned char V = 128;
+        unsigned char A = 127;
+        unsigned char B = 128;
+        unsigned char cosTab[256];
+
+
+        file_h = new BITMAPFILEHEADER;
+        info_h = new BITMAPINFOHEADER;
+        rgbPal = new RGBQUAD[256];
+
+        FILE* fp = fopen("czp.bmp", "wb");
+        if(fp == nullptr)
+        {
+            LOG("파일오픈 실패...");
+            return false;
+        }
+        else
+        {
+            LOG("파일 오픈 성공...");
+        }
+
+        file_h->bfType = 0x4D42;
+        file_h->bfReserved1 = 0;
+        file_h->bfReserved2 = 0;
+        file_h->bfOffBits = (sizeof(RGBQUAD)) + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+        file_h->bfSize = 256*256 + file_h->bfOffBits;
+
+
+        info_h->biSize = sizeof(BITMAPINFOHEADER);
+        info_h->biWidth = 256;
+        info_h->biHeight = 256;
+        info_h->biPlanes = 1;
+        info_h->biBitCount = 8;
+        info_h->biCompression = 0;
+        info_h->biXPelsPerMeter = 0;
+        info_h->biYPelsPerMeter = 0;
+        info_h->biClrUsed = 0;
+        info_h->biClrImportant = 0;
+        info_h->biSizeImage = 256*256;
+
+        for(int i=0; i<256; i++)
+        {
+            rgbPal[i].rgbRed = i;
+            rgbPal[i].rgbGreen= i;
+            rgbPal[i].rgbBlue= i;
+            rgbPal[i].rgbReserved= 0;
+        }
+
+        double image[256][256];
+        for(int i=0; i<256; i++)
+        {
+            for(int j=0; j<256; j++)
+            {
+                image[i][j] = (A*cos(((PI/H)*i*i) + ((PI/V)*j*j))) +B;
+                //printf(" %f\n", (A*cos(((PI/H)*i*i) + ((PI/V)*j*j))) + B);
+            }
+        }
+        
+        fwrite((char*)file_h, 1, sizeof(BITMAPFILEHEADER), fp);
+        fwrite((char*)info_h, 1, sizeof(BITMAPINFOHEADER), fp);
+        fwrite((char*)rgbPal, 1, sizeof(RGBQUAD)*256, fp);
+        for(int i=0; i<(info_h)->biHeight; i++)
+        {
+            fwrite(image[i],1, (info_h)->biWidth, fp);
+        }
+        fclose(fp);
+        return true;
     }
 }// hkl
