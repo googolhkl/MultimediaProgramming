@@ -7,6 +7,7 @@ int main()
 {
     hkl::BMP controller;
     int x,y;
+    int czvSize;
 
     controller.LoadBmp("boats.bmp");
 
@@ -15,15 +16,16 @@ int main()
     //controller.SaveBmp("result.bmp", &hkl::BMP::histogramEQ);
     
     
-    /*
     cout<<"input filter 'x' size :";
     cin>>x;
     cout<<"input filter 'y' size :";
     cin>>y;
 
     controller.ConvolutionFilter("result.bmp",y,x);
-    */
-    controller.makeCZP();
+
+    cout<<"CZP file size(256or512) :";
+    cin>>czvSize;
+    controller.makeCZP(czvSize);
     //controller.GarbageCollection();
     return 0;
 }

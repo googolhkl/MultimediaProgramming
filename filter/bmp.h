@@ -85,7 +85,7 @@ class BMP
         BYTE calcFilter(void);
         bool ConvolutionFilter(const char *filename,int y, int x);
         double scanFraction();
-        bool makeCZP();
+        bool makeCZP(int size);
 
     private:
         BYTE** image;

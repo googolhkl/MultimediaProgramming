@@ -456,21 +456,18 @@ namespace hkl
         return result;
     }
 
-    bool BMP::makeCZP()
+    bool BMP::makeCZP(int size)
     {
-        double PI = 3.141592;
-        unsigned char H = 255;
-        unsigned char V = 255;
+        double PI;
+        int H = size;
+        int V = size;
         unsigned char A = 127;
         unsigned char B = 128;
-        double a = (double) PI/256;
-        double b = (double) PI/256;
-        unsigned char cosTab[256];
-
 
         file_h = new BITMAPFILEHEADER;
         info_h = new BITMAPINFOHEADER;
         rgbPal = new RGBQUAD[256];
+        PI = 4* atan(1);
 
         FILE* fp = fopen("czp.bmp", "wb");
         if(fp == nullptr)
@@ -487,12 +484,12 @@ namespace hkl
         file_h->bfReserved1 = 0;
         file_h->bfReserved2 = 0;
         file_h->bfOffBits = (sizeof(RGBQUAD)) + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-        file_h->bfSize = 256*256 + file_h->bfOffBits;
+        file_h->bfSize = size*size + file_h->bfOffBits;
 
 
         info_h->biSize = sizeof(BITMAPINFOHEADER);
-        info_h->biWidth = 256;
-        info_h->biHeight = 256;
+        info_h->biWidth = size;
+        info_h->biHeight = size;
         info_h->biPlanes = 1;
         info_h->biBitCount = 8;
         info_h->biCompression = 0;
@@ -500,7 +497,7 @@ namespace hkl
         info_h->biYPelsPerMeter = 0;
         info_h->biClrUsed = 0;
         info_h->biClrImportant = 0;
-        info_h->biSizeImage = 256*256;
+        info_h->biSizeImage = size*size;
 
         for(int i=0; i<256; i++)
         {
@@ -510,21 +507,18 @@ namespace hkl
             rgbPal[i].rgbReserved= 0;
         }
 
-        //unsigned char image[256][256];
-
-        BYTE** image= new BYTE*[256];
-        for(int i=0; i<256; i++)
+        BYTE** image= new BYTE*[size];
+        for(int i=0; i<size; i++)
         {
-            image[i] = new BYTE[256];
-            memset(image[i], 0, sizeof(BYTE) * 256);
-            printf("%d \n", i);
+            image[i] = new BYTE[size];
+            memset(image[i], 0, sizeof(BYTE) * size);
         }
 
-        for(int i=0; i<256; i++)
+        for(int i=0; i<size; i++)
         {
-            for(int j=0; j<256; j++)
+            for(int j=0; j<size; j++)
             {
-                image[i][j] = (A*cos(((PI/H)*(i-(256/2)-1)*(i-(256/2)-1)) + ((PI/V)*(j-(256/2)-1)*(j-(256/2)-1)))) +B;
+                image[i][j] = (A*cos(((PI/H)*(i-(size/2)-1)*(i-(size/2)-1)) + ((PI/V)*(j-(size/2)-1)*(j-(size/2)-1)))) +B;
             }
         }
         
