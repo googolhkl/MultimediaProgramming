@@ -459,10 +459,12 @@ namespace hkl
     bool BMP::makeCZP()
     {
         double PI = 3.141592;
-        unsigned char H = 128;
-        unsigned char V = 128;
+        unsigned char H = 255;
+        unsigned char V = 255;
         unsigned char A = 127;
         unsigned char B = 128;
+        double a = (double) PI/256;
+        double b = (double) PI/256;
         unsigned char cosTab[256];
 
 
@@ -508,12 +510,12 @@ namespace hkl
             rgbPal[i].rgbReserved= 0;
         }
 
-        double image[256][256];
+        unsigned char image[256][256];
         for(int i=0; i<256; i++)
         {
             for(int j=0; j<256; j++)
             {
-                image[i][j] = (A*cos(((PI/H)*i*i) + ((PI/V)*j*j))) +B;
+                image[i][j] = (A*cos(((PI/H)*(i-(256/2)-1)*(i-(256/2)-1)) + ((PI/V)*(j-(256/2)-1)*(j-(256/2)-1)))) +B;
                 //printf(" %f\n", (A*cos(((PI/H)*i*i) + ((PI/V)*j*j))) + B);
             }
         }
