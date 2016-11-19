@@ -510,13 +510,21 @@ namespace hkl
             rgbPal[i].rgbReserved= 0;
         }
 
-        unsigned char image[256][256];
+        //unsigned char image[256][256];
+
+        BYTE** image= new BYTE*[256];
+        for(int i=0; i<256; i++)
+        {
+            image[i] = new BYTE[256];
+            memset(image[i], 0, sizeof(BYTE) * 256);
+            printf("%d \n", i);
+        }
+
         for(int i=0; i<256; i++)
         {
             for(int j=0; j<256; j++)
             {
                 image[i][j] = (A*cos(((PI/H)*(i-(256/2)-1)*(i-(256/2)-1)) + ((PI/V)*(j-(256/2)-1)*(j-(256/2)-1)))) +B;
-                //printf(" %f\n", (A*cos(((PI/H)*i*i) + ((PI/V)*j*j))) + B);
             }
         }
         
