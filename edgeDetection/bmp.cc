@@ -669,6 +669,8 @@ namespace hkl
     bool BMP::EdgeDetection(const char *filename)
     {
         int i;
+        int threshold = 30;
+        int value = 0;
 
         // 파일 오픈
         FILE* fp = nullptr;
@@ -693,8 +695,14 @@ namespace hkl
         }
 
         // FillTempFilter에서 채울 공간 생성
-        MakeTempFilter(3,3);
+        int fSize = 5;
+        MakeTempFilter(fSize,fSize);
         MakeSobelFilters();
+
+        // 중간값
+        /*
+        MakeSortedArray(fSize,fSize);
+        */
 
         // 이미지의 픽셀 하나하나 돌면서 수정
         for(int i=0; i<info_h->biHeight; i++)
@@ -702,8 +710,26 @@ namespace hkl
             for(int j=0; j< info_h->biWidth; j++)
             {
                 FillTempFilter(i,j);
-                // 여기에 주변값 정렬하는 것 오면댐
-                resultImage[i][j] = CalcSobelFilter();
+
+                // 중간값
+                /*
+                FillSortedArray(fSize,fSize);
+                SortArray(fSize*fSize);
+                threshold = sortedArray[(fSize*fSize)/2];
+                */
+
+                value = CalcSobelFilter();
+                threshold = CalcThreshold(fSize);
+
+                if(value > threshold) 
+                {
+                    resultImage[i][j] = value;
+                }
+                else
+                {
+                    resultImage[i][j] = 0;
+                }
+
             }
         }
 
@@ -722,7 +748,6 @@ namespace hkl
             delete[] image[i];
         }
         delete[] image;
-        printf("여기까지댐?4\n");
 
         fclose(fp);
         return true;
@@ -794,6 +819,20 @@ namespace hkl
         }
 
         return sumr+sumc;
+    }
+
+    int BMP::CalcThreshold(int num)
+    {
+        int sum = 0;
+        for(int i=0; i<3; i++)
+        {
+            for(int j=0; j<3; j++)
+            {
+                sum += makedFilter[i][j];
+            }
+        }
+        num = num*num;
+        return sum/num;
     }
 
 }// hkl

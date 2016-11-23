@@ -94,6 +94,7 @@ class BMP
         bool EdgeDetection(const char *filename);
         bool MakeSobelFilters();
         int CalcSobelFilter();
+        int CalcThreshold(int num);
 
     private:
         BYTE** image;
