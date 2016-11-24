@@ -669,7 +669,7 @@ namespace hkl
     bool BMP::EdgeDetection(const char *filename)
     {
         int i;
-        int threshold = 30;
+        int threshold = 250;
         int value = 0;
 
         // 파일 오픈
@@ -695,7 +695,7 @@ namespace hkl
         }
 
         // FillTempFilter에서 채울 공간 생성
-        int fSize = 5;
+        int fSize = 15;
         MakeTempFilter(fSize,fSize);
         MakeSobelFilters();
 
@@ -719,16 +719,18 @@ namespace hkl
                 */
 
                 value = CalcSobelFilter();
-                threshold = CalcThreshold(fSize);
+                int thresh = 50-CalcThreshold(fSize);
+                //threshold =  256-CalcThreshold(fSize);
 
-                if(value > threshold) 
+                if(value < threshold) 
                 {
                     resultImage[i][j] = value;
                 }
                 else
                 {
-                    resultImage[i][j] = 0;
+                    resultImage[i][j] = 255;
                 }
+
 
             }
         }
